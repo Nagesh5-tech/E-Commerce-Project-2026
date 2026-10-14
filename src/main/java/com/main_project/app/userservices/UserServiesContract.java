@@ -5,5 +5,6 @@ import com.main_project.app.entities.User;
 public interface UserServiesContract {
 	
 	public User register(User user);
+	
 
 }

@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.main_project.app.entities.Role;
 import com.main_project.app.entities.User;
 import com.main_project.app.userrepositories.UserRepositories;
 import com.main_project.app.userservices.UserServiesContract;
@@ -34,6 +35,9 @@ public class UserServices implements UserServiesContract{
 	        throw new RuntimeException("Email is already taken");	
 	    }
 	    
+	    if (user.getRole() == null) {
+	        user.setRole(Role.CUSTOMER);
+	    }
 	    user.setPassword(passwordEncoder.encode(user.getPassword()));
 	    return userRepositories.save(user);
 	}

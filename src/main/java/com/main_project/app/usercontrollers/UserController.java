@@ -13,7 +13,7 @@ import com.main_project.app.entities.User;
 import com.main_project.app.userserviceimplementations.UserServices;
 
 @RestController
-@CrossOrigin
+@CrossOrigin(origins = {"http://localhost:5500", "http://127.0.0.1:5500", "http://localhost:5174", "http://localhost:5173", "http://localhost:3000"}, allowCredentials = "true")
 @RequestMapping("/api")
 public class UserController {
 	
