@@ -1,6 +1,8 @@
 package com.main_project.app.userserviceimplementations;
 
 import java.time.LocalDateTime;
+
+
 import java.util.Date;
 import java.util.Optional;
 
@@ -74,7 +76,7 @@ public class AuthService implements AuthServiceContract{
         return token;
     }
 
-    private String generateNewToken(User user) {
+    public String generateNewToken(User user) {
         return Jwts.builder()
                 .setSubject(user.getUsername())
                 .claim("role", user.getRole().name())
@@ -88,4 +90,56 @@ public class AuthService implements AuthServiceContract{
         JWTToken jwtToken = new JWTToken(user, token, LocalDateTime.now().plusHours(1));
         jwtTokenRepository.save(jwtToken);
     }
+
+	@Override
+	public boolean validateToken(String token) {
+        try {
+            System.err.println("VALIDATING TOKEN...");
+
+            // Parse and validate the token
+            Jwts.parserBuilder()
+                .setSigningKey(SIGNING_KEY)
+                .build()
+                .parseClaimsJws(token);
+
+            // Check if the token exists in the database and is not expired
+            Optional<JWTToken> jwtToken = jwtTokenRepository.findByToken(token);
+            if (jwtToken.isPresent()) {
+                System.err.println("Token Expiry: " + jwtToken.get().getExpiresAt());
+                System.err.println("Current Time: " + LocalDateTime.now());
+                return jwtToken.get().getExpiresAt().isAfter(LocalDateTime.now());
+            }
+
+            return false;
+        } catch (Exception e) {
+            System.err.println("Token validation failed: " + e.getMessage());
+            return false;
+        }
+    }
+
+    public String extractUsername(String token) {
+        return Jwts.parserBuilder()
+            .setSigningKey(SIGNING_KEY)
+            .build()
+            .parseClaimsJws(token)
+            .getBody()
+            .getSubject();
+    }
+
+	
+
+	@Override
+	public void logout(User user) {
+
+	    int userId = user.getUserId();
+
+	    // Retrieve the JWT token associated with the user
+	    JWTToken token = jwtTokenRepository.findByUserId(userId);
+
+	    // If token exists, delete it
+	    if (token != null) {
+	        jwtTokenRepository.deleteByUserId(userId);
+	    }
+	}
+
 }

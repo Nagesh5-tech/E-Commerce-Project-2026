@@ -1,5 +1,6 @@
 package com.main_project.app.userserviceimplementations;
 import java.util.*;
+
 import java.lang.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -27,19 +28,26 @@ public class UserServices implements UserServiesContract{
 
 	@Override
 	public User register(User user) {
-	    if(userRepositories.findByUsername(user.getUsername()).isPresent()) {
-	        throw new RuntimeException("Username is already taken");	
-	    }
-	    
-	    if(userRepositories.findByEmail(user.getEmail()).isPresent()) {
-	        throw new RuntimeException("Email is already taken");	
-	    }
-	    
-	    if (user.getRole() == null) {
-	        user.setRole(Role.CUSTOMER);
-	    }
-	    user.setPassword(passwordEncoder.encode(user.getPassword()));
-	    return userRepositories.save(user);
+		// Check if username or email already exists
+		if (userRepositories.findByUsername(user.getUsername()).isPresent()) {
+		throw new RuntimeException("Username is already taken");
+
+		}
+
+		if (userRepositories.findByEmail(user.getEmail()).isPresent()) {
+		throw new RuntimeException("Email is already registered");
+
+		}
+
+		// Encode password before saving
+		user.setPassword(passwordEncoder.encode(user.getPassword()));
+
+		// Save the user
+		return userRepositories.save(user);
 	}
+
+
+
+	
 
 }
